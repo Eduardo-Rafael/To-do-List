@@ -7,6 +7,7 @@ function TaskManager(){
   var domain = 'https://altcademy-to-do-list-api.herokuapp.com/';
   var message = null;
   var taskCounter = 0;
+  var completedTaskCounter = 0;
 
   //private methods
 
@@ -20,7 +21,7 @@ function TaskManager(){
     }
   }
 
-  var addTaskToboard = function(id, description){
+  var addTaskToboard = function(id, description, taskStatus){
     var board = $('#task-board');
     $('<div></div>' , {
       "Class": 'col-3 my-1',
@@ -40,7 +41,7 @@ function TaskManager(){
 
                   '<div class="col-6 d-flex align-items-center">' +
                     '<div class="form-check form-switch">' +
-                      '<input class="form-check-input" type="checkbox" />' +
+                      '<input class="form-check-input" type="checkbox" ' + ((taskStatus)?'checked' : '') +'/>' +
                       '<label class="form-check-label">Completed</label>' +
                     '</div>' +
                   '</div>' +
@@ -50,7 +51,6 @@ function TaskManager(){
               '</div>' +
 
             '</div>',
-      completed: false,
       taskId: id
     }).appendTo(board);
   }
@@ -76,7 +76,7 @@ function TaskManager(){
           emptyTaskBoard();
           for(var i = 0; i< response.tasks.length; i++)
           {
-            addTaskToboard(response.tasks[i].id, response.tasks[i].content);
+            addTaskToboard(response.tasks[i].id, response.tasks[i].content, response.tasks[i].completed);
           }
 
         }
@@ -103,7 +103,7 @@ function TaskManager(){
       }),
       success: function(response, textStatus){
 
-        addTaskToboard(response.task.id, response.task.content);
+        addTaskToboard(response.task.id, response.task.content, false);
         taskCounter ++;
         updateTaskCounterOfBoard();
         return true;
@@ -133,6 +133,46 @@ function TaskManager(){
       }
     });
   }
+
+  this.markTaskAsComplete = function(id, element){
+    $.ajax({
+      type: 'PUT',
+      url: domain + 'tasks/' + id + '/mark_complete?api_key=' + personalId,
+      success: function(response, textStatus){
+        
+        $(element).attr('checked' , 'true');
+        completedTaskCounter ++;
+        return true;
+
+      },
+      error: function(request, testStatus, errorMessage){
+
+        $(element).removeAttr('checked');
+        message = errorMessage;
+        return false;
+
+      }
+    });
+  }
+
+  this.markTaskAsActive = function(id, element){
+    $.ajax({
+      type: 'PUT',
+      url: domain + 'tasks/' + id + '/mark_active?api_key=' + personalId,
+      success: function(response, textStatus){
+        $(element).removeAttr('checked');
+        completedTaskCounter --;
+        return true;
+      },
+      error: function(request, testStatus, errorMessage){
+
+        $(element).attr('checked' , 'true');
+        message = errorMessage;
+        return false;
+
+      }
+    });
+  }
   
 
 }
@@ -158,6 +198,19 @@ $(document).ready(function(){
     var id = $(this).parents('.col-3').attr('taskId');
     taskManager.deleteTask(id , this);
   
+  });
+
+  $(document).on('click' , 'input.form-check-input', function(){
+    var id = $(this).parents('.col-3').attr('taskId');
+    if($(this).attr('checked') == undefined)
+    {
+      taskManager.markTaskAsComplete(id , this);
+    }  
+    else
+    {
+      taskManager.markTaskAsActive(id, this);
+    }
+      
   });
 
 });
