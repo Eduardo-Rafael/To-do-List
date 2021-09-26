@@ -121,8 +121,9 @@ function TaskManager(){
       type: 'DELETE',
       url: domain + 'tasks/' + id + '?api_key=' + personalId,
       success: function(response, textStatus){
-        console.log('I am in the success method');
         taskCounter --;
+        if($(element).parents('.col-3').find('.form-check-input').attr('checked') != undefined)
+          completedTaskCounter --;
         updateTaskCounterOfBoard(taskCounter);
         $(element).parents('.col-3').remove();
         return true;
