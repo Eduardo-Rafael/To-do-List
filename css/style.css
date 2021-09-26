@@ -1,1 +1,15 @@
 /* Author: Eduardo Carranza */
+
+/* general style */
+  body {
+    height: 100vh;
+    background-image: url('../images/hero-bg.jpg');
+    background-position: center;
+    background-size: cover;
+  }
+
+  header h1 {
+    color: #124265;
+    font-weight: 700;
+  }
+/* end of general style */

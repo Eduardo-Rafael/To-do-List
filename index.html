@@ -4,12 +4,57 @@
     <meta charset="utf-8" />
     <meta name="author" content="Eduardo Carranza" />
     <meta name="description" content="To do list practice" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <title>To Do List</title>
     <link rel="stylesheet" href="bootsTrap/bootstrap.min.css" />
     <link rel="stylesheet" href="css/style.css" />
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <script src="js/function.js"></script>
   </head>
   <body>
+    <section>
+      <div class="container">
+        <header>
+          <h1 class="text-center my-3">To Do List</h1>
+          <div class="row my-3">
+            <!-- first column -->
+            <div class="col-8">
+              <input type="text" placeholder="What do you need?" class="w-100 form-control" />
+            </div>
+            <!-- end of first column -->
 
+            <!-- second column -->
+            <div class="col-4">
+              <button type="submit" class="btn btn-primary" >Create Task</button>
+            </div>
+            <!-- end of second column -->
+          </div>
+        </header>
+
+        <section id="task-board" class="row my-3">
+          <div class="row">
+            
+          </div>
+        </section>
+
+        <footer id="status-bar" class="py-2">
+          <div class="row justify-content-between align-items-center">
+            <!-- first column -->
+            <div class="col">
+              <span id="task-amount" class="text-white p-2 bg-primary rounded">Tasks: <span class="badge bg-secondary">0</span></span>
+            </div>
+            <!-- end of first column -->
+
+            <!-- second column -->
+            <div class="col d-flex justify-content-end">
+              <button type="button" class="btn btn-secondary">All</button>
+              &nbsp;<button type="button" class="btn btn-secondary" >Active</button>
+              &nbsp;<button type="button" class="btn btn-secondary" >Completed</button>
+            </div>
+            <!-- end of second colun -->
+          </div>
+        </footer>
+      </div>
+    </section>
   </body>
 </html>
