@@ -35,7 +35,7 @@ function TaskManager(){
                 '<div class="row">' +
 
                   '<div class="col-6">' +
-                    '<button type="button" class="btn btn-primary">Remove</button>' +
+                    '<button type="button" class="btn btn-primary remove-task">Remove</button>' +
                   '</div>' +
 
                   '<div class="col-6 d-flex align-items-center">' +
@@ -50,7 +50,8 @@ function TaskManager(){
               '</div>' +
 
             '</div>',
-      completed: false
+      completed: false,
+      taskId: id
     }).appendTo(board);
   }
 
@@ -61,6 +62,7 @@ function TaskManager(){
 
   //public methods
   this.getErrorMessage = function(){return message;}
+
   this.getTasks = function(){
     $.ajax({
       type: 'GET',
@@ -71,7 +73,6 @@ function TaskManager(){
         taskCounter = response.tasks.length;
         if(response.tasks.length > 0)
         {
-          console.log(response);
           emptyTaskBoard();
           for(var i = 0; i< response.tasks.length; i++)
           {
@@ -90,7 +91,6 @@ function TaskManager(){
   }
 
   this.createNewTask = function(description){
-    console.log('Making http Request');
     $.ajax({
       type: 'POST',
       url: domain + 'tasks/?api_key=' + personalId,
@@ -108,6 +108,24 @@ function TaskManager(){
         updateTaskCounterOfBoard();
         return true;
         
+      },
+      error: function(request, textStatus, errorMessage){
+        message = errorMessage;
+        return false;
+      }
+    });
+  }
+
+  this.deleteTask = function(id , element){
+    $.ajax({
+      type: 'DELETE',
+      url: domain + 'tasks/' + id + '?api_key=' + personalId,
+      success: function(response, textStatus){
+        console.log('I am in the success method');
+        taskCounter --;
+        updateTaskCounterOfBoard();
+        $(element).parents('.col-3').remove();
+        return true;
       },
       error: function(request, textStatus, errorMessage){
         message = errorMessage;
@@ -133,6 +151,13 @@ $(document).ready(function(){
     
     $('#task-input').val('');
 
+  });
+
+  $(document).on('click', 'button.remove-task', function(){
+    
+    var id = $(this).parents('.col-3').attr('taskId');
+    taskManager.deleteTask(id , this);
+  
   });
 
 });
