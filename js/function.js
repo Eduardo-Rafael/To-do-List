@@ -55,8 +55,8 @@ function TaskManager(){
     }).appendTo(board);
   }
 
-  var updateTaskCounterOfBoard = function(){
-    $('#task-amount span').text(taskCounter);
+  var updateTaskCounterOfBoard = function(counter){
+    $('#task-amount span').text(counter);
   }
 
 
@@ -80,7 +80,7 @@ function TaskManager(){
           }
 
         }
-        updateTaskCounterOfBoard();
+        updateTaskCounterOfBoard(taskCounter);
         return true;
       },
       error: function(request, textStatus, errorMessage){
@@ -105,7 +105,7 @@ function TaskManager(){
 
         addTaskToboard(response.task.id, response.task.content, false);
         taskCounter ++;
-        updateTaskCounterOfBoard();
+        updateTaskCounterOfBoard(taskCounter);
         return true;
         
       },
@@ -123,7 +123,7 @@ function TaskManager(){
       success: function(response, textStatus){
         console.log('I am in the success method');
         taskCounter --;
-        updateTaskCounterOfBoard();
+        updateTaskCounterOfBoard(taskCounter);
         $(element).parents('.col-3').remove();
         return true;
       },
@@ -173,6 +173,60 @@ function TaskManager(){
       }
     });
   }
+
+  this.ShowCompletedTasks = function(){
+    $.ajax({
+      type: 'GET',
+      url: domain + 'tasks/?api_key=' + personalId,
+      dataType: 'json',
+      success: function(response, textStatus){
+        if(response.tasks.length > 0)
+        {
+          emptyTaskBoard();
+          for(var i =0; i< response.tasks.length; i++)
+          {
+            if(response.tasks[i].completed == true)
+            {
+              addTaskToboard(response.tasks[i].id, response.tasks[i].content, response.tasks[i].completed);
+            }
+          }
+        }
+        updateTaskCounterOfBoard(completedTaskCounter);
+        return true;
+      },
+      error: function(request, textStatus, errorMessage){
+        message = errorMessage;
+        return false;
+      }
+    });
+  }
+
+  this.ShowActiveTasks = function(){
+    $.ajax({
+      type: 'GET',
+      url: domain + 'tasks/?api_key=' + personalId,
+      dataType: 'json',
+      success: function(response, textStatus){
+        if(response.tasks.length > 0)
+        {
+          emptyTaskBoard();
+          for(var i =0; i < response.tasks.length; i++)
+          {
+            if(!response.tasks[i].completed)
+            {
+              addTaskToboard(response.tasks[i].id, response.tasks[i].content, response.tasks[i].completed);
+            }
+          }
+        }
+        updateTaskCounterOfBoard(taskCounter - completedTaskCounter);
+        return true;
+      },
+      error: function(request, textStatus, errorMessage){
+        message = errorMessage;
+        return false;
+      }
+    });
+  }
   
 
 }
@@ -183,6 +237,8 @@ $(document).ready(function(){
   //creates task manager
   var taskManager = new TaskManager();
   taskManager.getTasks();
+  $('#all-button').addClass('bg-success');
+  $('#all-button').attr('disabled', 'true');
 
   $('#create-task').submit(function(event){
     event.preventDefault();
@@ -211,6 +267,31 @@ $(document).ready(function(){
       taskManager.markTaskAsActive(id, this);
     }
       
+  });
+
+  $('#completed-button').click(function(){
+    $(this).addClass('bg-success');
+    $(this).siblings().each(function(index, element){
+      $(element).removeClass('bg-success');
+    });
+    taskManager.ShowCompletedTasks();
+    $('#all-button').removeAttr('disabled');
+  });
+
+  $('#active-button').click(function(){
+    $(this).addClass('bg-success');
+    $(this).siblings().each(function(index, element){
+      $(element).removeClass('bg-success');
+    });
+    taskManager.ShowActiveTasks();
+  });
+
+  $('#all-button').click(function(){
+    $(this).addClass('bg-success');
+    $(this).siblings().each(function(index, element){
+      $(element).removeClass('bg-success');
+    });
+    taskManager.getTasks();
   });
 
 });
