@@ -1,5 +1,11 @@
 //Author: Eduardo Carranza
 
+const DisplayStatusOfBoard = {
+  All: 'All tasks',
+  Active: 'Active Tasks',
+  Completed: 'Completed Tasks'
+}
+
 function TaskManager(){
 
   //private properties
