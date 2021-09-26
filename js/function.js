@@ -7,6 +7,8 @@ function TaskManager(){
   var domain = 'https://altcademy-to-do-list-api.herokuapp.com/';
   var message = null;
 
+  //private methods
+
   var emptyTaskBoard = function(){
     var board = $('#task-board');
     if(board.children().length > 0)
@@ -57,7 +59,7 @@ function TaskManager(){
     $.ajax({
       type: 'GET',
       url: domain + 'tasks/?api_key=' + personalId,
-      dataType: 'JSON',
+      dataType: 'json',
       success: function(response, textStatus){
         if(textStatus == 200)
         {
@@ -77,6 +79,32 @@ function TaskManager(){
         message = errorMessage;
         return false;
       } 
+    });
+  }
+
+  this.createNewTask = function(description){
+    $.ajax({
+      type: 'POST',
+      url: domain + 'tasks/?api_key=' + personalId,
+      contentType: 'application/json',
+      dataType: 'json',
+      data: JSON.stringify({
+        task:{
+          content: description
+        }
+      }),
+      success: function(response, textStatus){
+        if(textStatus == 200)
+        {
+          addTaskToboard(response.task.id, response.task.content);
+          return true;
+        }
+        return false;
+      },
+      error: function(request, textStatus, errorMessage){
+        message = errorMessage;
+        return false;
+      }
     });
   }
   
