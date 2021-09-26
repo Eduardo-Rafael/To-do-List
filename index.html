@@ -16,10 +16,10 @@
       <div class="container">
         <header>
           <h1 class="text-center my-3">To Do List</h1>
-          <div class="row my-3">
+          <form class="row my-3" id="create-task">
             <!-- first column -->
             <div class="col-8">
-              <input type="text" placeholder="What do you need?" class="w-100 form-control" />
+              <input type="text" placeholder="What do you need?" class="w-100 form-control" required id="task-input" />
             </div>
             <!-- end of first column -->
 
@@ -28,7 +28,7 @@
               <button type="submit" class="btn btn-primary" >Create Task</button>
             </div>
             <!-- end of second column -->
-          </div>
+          </form>
         </header>
 
         <section id="task-board" class="row my-3">

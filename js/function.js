@@ -6,6 +6,7 @@ function TaskManager(){
   var personalId = 144;
   var domain = 'https://altcademy-to-do-list-api.herokuapp.com/';
   var message = null;
+  var taskCounter = 0;
 
   //private methods
 
@@ -50,30 +51,36 @@ function TaskManager(){
 
             '</div>',
       completed: false
-    }).apendTo(board);
+    }).appendTo(board);
+  }
+
+  var updateTaskCounterOfBoard = function(){
+    $('#task-amount span').text(taskCounter);
   }
 
 
   //public methods
+  this.getErrorMessage = function(){return message;}
   this.getTasks = function(){
     $.ajax({
       type: 'GET',
       url: domain + 'tasks/?api_key=' + personalId,
       dataType: 'json',
       success: function(response, textStatus){
-        if(textStatus == 200)
-        {
-          if(response.tasks.length > 0)
-          {
-            emptyTaskBoard();
-            response.tasks.foreach(function(taskObject){
-              addTaskToboard(taskObject.id, taskObject.content);
-            });
 
+        taskCounter = response.tasks.length;
+        if(response.tasks.length > 0)
+        {
+          console.log(response);
+          emptyTaskBoard();
+          for(var i = 0; i< response.tasks.length; i++)
+          {
+            addTaskToboard(response.tasks[i].id, response.tasks[i].content);
           }
-          return true;
+
         }
-        return false;
+        updateTaskCounterOfBoard();
+        return true;
       },
       error: function(request, textStatus, errorMessage){
         message = errorMessage;
@@ -83,6 +90,7 @@ function TaskManager(){
   }
 
   this.createNewTask = function(description){
+    console.log('Making http Request');
     $.ajax({
       type: 'POST',
       url: domain + 'tasks/?api_key=' + personalId,
@@ -94,12 +102,12 @@ function TaskManager(){
         }
       }),
       success: function(response, textStatus){
-        if(textStatus == 200)
-        {
-          addTaskToboard(response.task.id, response.task.content);
-          return true;
-        }
-        return false;
+
+        addTaskToboard(response.task.id, response.task.content);
+        taskCounter ++;
+        updateTaskCounterOfBoard();
+        return true;
+        
       },
       error: function(request, textStatus, errorMessage){
         message = errorMessage;
@@ -113,5 +121,18 @@ function TaskManager(){
 
 
 $(document).ready(function(){
+
+  //creates task manager
+  var taskManager = new TaskManager();
+  taskManager.getTasks();
+
+  $('#create-task').submit(function(event){
+    event.preventDefault();
+    if(!taskManager.createNewTask($('#task-input').val()))
+      console.log(taskManager.getErrorMessage());
+    
+    $('#task-input').val('');
+
+  });
 
 });
