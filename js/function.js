@@ -14,6 +14,7 @@ function TaskManager(){
   var message = null;
   var taskCounter = 0;
   var completedTaskCounter = 0;
+  var displayState = DisplayStatusOfBoard.All;
 
   //private methods
 
@@ -130,7 +131,20 @@ function TaskManager(){
         taskCounter --;
         if($(element).parents('.col-3').find('.form-check-input').attr('checked') != undefined)
           completedTaskCounter --;
-        updateTaskCounterOfBoard(taskCounter);
+
+        switch(displayState)
+        {
+          case DisplayStatusOfBoard.Completed :
+            updateTaskCounterOfBoard(completedTaskCounter);
+            break;
+          case DisplayStatusOfBoard.Active :
+            updateTaskCounterOfBoard(taskCounter - completedTaskCounter);
+            break;
+          default :
+            updateTaskCounterOfBoard(taskCounter);
+            break;
+        }
+        
         $(element).parents('.col-3').remove();
         return true;
       },
@@ -235,6 +249,9 @@ function TaskManager(){
     });
   }
   
+  this.updateDisplayStateOfBoard = function(state){
+    displayState = state;
+  }
 
 }
 
@@ -277,6 +294,7 @@ $(document).ready(function(){
   });
 
   $('#completed-button').click(function(){
+    taskManager.updateDisplayStateOfBoard(DisplayStatusOfBoard.Completed);
     $(this).addClass('bg-success');
     $(this).siblings().each(function(index, element){
       $(element).removeClass('bg-success');
@@ -286,6 +304,7 @@ $(document).ready(function(){
   });
 
   $('#active-button').click(function(){
+    taskManager.updateDisplayStateOfBoard(DisplayStatusOfBoard.Active);
     $(this).addClass('bg-success');
     $(this).siblings().each(function(index, element){
       $(element).removeClass('bg-success');
@@ -294,6 +313,7 @@ $(document).ready(function(){
   });
 
   $('#all-button').click(function(){
+    taskManager.updateDisplayStateOfBoard(DisplayStatusOfBoard.All);
     $(this).addClass('bg-success');
     $(this).siblings().each(function(index, element){
       $(element).removeClass('bg-success');
