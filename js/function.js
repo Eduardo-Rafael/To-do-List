@@ -113,6 +113,7 @@ function TaskManager(){
         addTaskToboard(response.task.id, response.task.content, false);
         taskCounter ++;
         updateTaskCounterOfBoard(taskCounter);
+        console.log('Task ' + response.task.id + ' has been crated');
         return true;
         
       },
@@ -146,6 +147,7 @@ function TaskManager(){
         }
         
         $(element).parents('.col-3').remove();
+        console.log('Task ' + id + ' has been removed');
         return true;
       },
       error: function(request, textStatus, errorMessage){
@@ -163,6 +165,12 @@ function TaskManager(){
         
         $(element).attr('checked' , 'true');
         completedTaskCounter ++;
+        if(displayState == DisplayStatusOfBoard.Active)
+        {
+          $(element).parents('.col-3').remove();
+          updateTaskCounterOfBoard(taskCounter - completedTaskCounter);
+        }
+        console.log('Task ' + id + ' has been marked as completed');
         return true;
 
       },
@@ -183,6 +191,12 @@ function TaskManager(){
       success: function(response, textStatus){
         $(element).removeAttr('checked');
         completedTaskCounter --;
+        if(displayState == DisplayStatusOfBoard.Completed)
+        {
+          $(element).parents('.col-3').remove();
+          updateTaskCounterOfBoard(completedTaskCounter);
+        }
+        console.log('Task ' + id + ' has been marked as active');
         return true;
       },
       error: function(request, testStatus, errorMessage){
@@ -266,9 +280,7 @@ $(document).ready(function(){
 
   $('#create-task').submit(function(event){
     event.preventDefault();
-    if(!taskManager.createNewTask($('#task-input').val()))
-      console.log(taskManager.getErrorMessage());
-    
+    taskManager.createNewTask($('#task-input').val());
     $('#task-input').val('');
 
   });
@@ -301,6 +313,7 @@ $(document).ready(function(){
     });
     taskManager.ShowCompletedTasks();
     $('#all-button').removeAttr('disabled');
+    $('header button[type = "submit"]').attr('disabled' , 'true');
   });
 
   $('#active-button').click(function(){
@@ -310,6 +323,9 @@ $(document).ready(function(){
       $(element).removeClass('bg-success');
     });
     taskManager.ShowActiveTasks();
+    $('#all-button').removeAttr('disabled');
+    if($('header button[type = "submit"]').attr('disabled') != undefined)
+      $('header button[type = "submit"]').removeAttr('disabled');
   });
 
   $('#all-button').click(function(){
@@ -319,6 +335,8 @@ $(document).ready(function(){
       $(element).removeClass('bg-success');
     });
     taskManager.getTasks();
+    if($('header button[type = "submit"]').attr('disabled') != undefined)
+      $('header button[type = "submit"]').removeAttr('disabled');
   });
 
 });
